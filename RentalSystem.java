@@ -3,6 +3,24 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class RentalSystem {
+	
+	// holds the instance
+	private static class SingleInstance{
+		private static final RentalSystem INSTANCE = new RentalSystem();
+	}
+	
+	//getter for the instance
+	public static RentalSystem getInstance() {
+		return SingleInstance.INSTANCE;
+	}
+	
+	//constructor
+	private RentalSystem() {
+        vehicles = new ArrayList<>();
+        customers = new ArrayList<>();
+        rentalHistory = new RentalHistory();
+	}
+	
     private List<Vehicle> vehicles = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
     private RentalHistory rentalHistory = new RentalHistory();
