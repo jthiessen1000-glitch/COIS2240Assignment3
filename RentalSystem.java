@@ -205,7 +205,7 @@ public class RentalSystem {
         return true;
     	}
     	else {
-    		System.out.print("customer id ID already exists ");
+    		System.out.print("customer ID already exists ");
         return false;
     	}
     }
