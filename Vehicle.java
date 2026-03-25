@@ -46,7 +46,7 @@ public abstract class Vehicle {
     public VehicleStatus getStatus() { return status; }
 
     public String getInfo() {
-        return "| Plate: " + licensePlate + " | make: " + make + " | model: " + model + " | year: " + year + " | " + status + " |";
+        return "| Plate: " + licensePlate + " | make: " + make + " | model: " + model + " | year: " + year + " | Status: " + status + " |";
     }
 
 }

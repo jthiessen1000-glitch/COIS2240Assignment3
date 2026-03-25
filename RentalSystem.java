@@ -65,6 +65,7 @@ public class RentalSystem {
 	    
 		 
 		 // Load vehicles from vehicles.txt
+		//| Plate: 1 | make: 1 | model: 1 | year: 1 | Status: Available | | Seats: 1
 		    try (BufferedReader reader = new BufferedReader(new FileReader("vehicles.txt"))) {
 		        String line;
 		        while ((line = reader.readLine()) != null) {
@@ -137,83 +138,51 @@ public class RentalSystem {
         return "";
     }
     
-    
+ // System.out.print(" ");   
  // method for loading vehicle data
- 	private Vehicle parseVehicle(String line) {
-// 		System.out.print(line);
-// 		System.out.print("\n");
- 	    String[] parts = line.split("\\|");
- 	    if (parts.length < 6) return null; // Need at least common fields + empty separator
+    private Vehicle parseVehicle(String line) {
+        String[] parts = line.split("\\|");
 
- 	    // Extract common fields (indices 0-4)
- 
- 	    String plate = extractValue(parts[1], "Plate:");
- 	    String make = extractValue(parts[2], "make:");
- 	    String model = extractValue(parts[3], "model:");
-	   System.out.print("0" + parts[0]);
-	  System.out.print("1" + parts[1]);
-   System.out.print("2" + parts[2]);
- 	    System.out.print("3" + parts[3]);
-	   System.out.print("4" + parts[4]);
-	  System.out.print("5" + parts[5]);
-System.out.print("6" + parts[6]);
-	System.out.print("7" + parts[7]);
-//	System.out.print("\n");
-//	
-//	System.out.print( parts);
-	
- 	    int year = Integer.parseInt(extractValue(parts[4], "year:"));
- 	    String statusStr = extractValue(parts[5], "status:");
+        // Extract common fields
+        String plate = extractValue(parts[1], "Plate:");
+        String make = extractValue(parts[2], "make:");
+        String model = extractValue(parts[3], "model:");
+        int year = Integer.parseInt(extractValue(parts[4], "year:"));
+        String statusStr = extractValue(parts[5], "Status:");
 
- 	    // The remaining parts (index 6 is empty, then type-specific fields)
- 	    // parts[6] onward
- 	    if (parts.length < 6) return null;
+        // Determine vehicle type by looking at the next part (index 7 usually)(6 is empty)
+        Vehicle v = null;
+        String field = parts[7].trim();
+        if (field.startsWith("Seats:")) {
+            int seats = Integer.parseInt(extractValue(parts[7], "Seats:"));
+            v = new Car(make, model, year, seats);
+            } else if (field.startsWith("Accessible:")) {
+                boolean accessible = extractValue(parts[7], "Accessible:").equalsIgnoreCase("Yes");
+                v = new Minibus(make, model, year, accessible);
+            } else if (field.startsWith("Cargo Size:")) {
+                double cargoSize = Double.parseDouble(extractValue(parts[6], "Cargo Size:"));
+                boolean hasTrailer = false;
+                if (parts.length > 8 && parts[8].trim().startsWith("Has Trailer:")) {
+                    hasTrailer = extractValue(parts[8], "Has Trailer:").equalsIgnoreCase("Yes");
+                }
+                v = new PickupTruck(make, model, year, cargoSize, hasTrailer);
+            }
 
- 	    // Determine vehicle type by looking at the next part(s)
- 	    String field1 = parts[7].trim();
- 	    if (field1.startsWith("Seats:")) {
- 	        // Car
- 	        int seats = Integer.parseInt(extractValue(parts[7], "Seats:"));
- 	        Car car = new Car(make, model, year, seats);
- 	        car.setLicensePlate(plate);
- 	        car.setStatus(statusStr.equalsIgnoreCase("Rented") ?
- 	              Vehicle.VehicleStatus.Rented : Vehicle.VehicleStatus.Available);
- 	        
- 	        return car;
- 	    } else if (field1.startsWith("Accessible:")) {
- 	        // Minibus
- 	        boolean accessible = extractValue(parts[7], "Accessible:").equalsIgnoreCase("Yes");
- 	        Minibus minibus = new Minibus(make, model, year, accessible);
- 	        minibus.setLicensePlate(plate);
- 	        minibus.setStatus(statusStr.equalsIgnoreCase("Rented") ?
- 	              Vehicle.VehicleStatus.Rented : Vehicle.VehicleStatus.Available);
-	        
- 	        return minibus;
- 	    } else if (field1.startsWith("Cargo Size:")) {
- 	        // PickupTruck – may have a second field for trailer
- 	        double cargoSize = Double.parseDouble(extractValue(parts[7], "Cargo Size:"));
- 	        boolean hasTrailer = false;
- 	        if (parts.length >= 8) {
- 	            String field2 = parts[8].trim();
- 	            if (field2.startsWith("Has Trailer:")) {
- 	                hasTrailer = extractValue(parts[8], "Has Trailer:").equalsIgnoreCase("Yes");
- 	            }
- 	        }
- 	        PickupTruck truck = new PickupTruck(make, model, year, cargoSize, hasTrailer);
- 	       truck.setLicensePlate(plate);
- 	      truck.setStatus(statusStr.equalsIgnoreCase("Rented") ?
- 	             Vehicle.VehicleStatus.Rented : Vehicle.VehicleStatus.Available);
- 	        return truck;
- 	    } else {
- 	        return null;
- 	    }
- 	   
- 	}
+        if (v != null) {
+            v.setLicensePlate(plate);
+            if (statusStr.equals("Available")) {
+                v.setStatus(Vehicle.VehicleStatus.Available);
+            } else if (statusStr.equals("Rented")) {
+                v.setStatus(Vehicle.VehicleStatus.Rented);
+            }
+        }
+        return v;
+    }
     
     
     public void addVehicle(Vehicle vehicle) {
         vehicles.add(vehicle);
-        saveVehicle(vehicle);
+        saveVehicle();
     }
 
     public void addCustomer(Customer customer) {
@@ -222,13 +191,14 @@ System.out.print("6" + parts[6]);
     }
     
 
-    public void saveVehicle(Vehicle vehicle) {
-        // Append vehicle details to vehicles.txt
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("vehicles.txt", true))) {
-            writer.write(vehicle.getInfo());
-            writer.newLine();
+    public void saveVehicle() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("vehicles.txt"))) {
+            for (Vehicle v : vehicles) {
+                writer.write(v.getInfo());
+                writer.newLine();
+            }
         } catch (IOException e) {
-            System.err.println("Error saving vehicle: " + e.getMessage());
+            System.err.println("Error saving vehicles: " + e.getMessage());
         }
     }
 
@@ -262,6 +232,7 @@ System.out.print("6" + parts[6]);
         else {
             System.out.println("Vehicle is not available for renting.");
         }
+        saveVehicle();
         RentalRecord record = new RentalRecord(vehicle, customer, date, amount, "RENT");
         saveRecords(record);
 
@@ -276,6 +247,7 @@ System.out.print("6" + parts[6]);
         else {
             System.out.println("Vehicle is not rented.");
         }
+        saveVehicle();
         RentalRecord record = new RentalRecord(vehicle, customer, date, extraFees, "RETURN");
         saveRecords(record);
     }    
