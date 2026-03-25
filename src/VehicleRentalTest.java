@@ -38,33 +38,32 @@ class VehicleRentalTest {
     
     @Test
     public void testRentAndReturnVehicle() {
-        // 1. Instantiate Vehicle and Customer objects
-        //    (Using Car as a concrete Vehicle subclass; adjust if needed)
+        // Instantiate Vehicle and Customer objects
         Vehicle car = new Car("Toyota", "Camry", 2022, 5);
         car.setLicensePlate("ABC123");          // Set a valid plate for completeness
         Customer customer = new Customer(1001, "John Doe");
 
-        // 2. Ensure the vehicle is initially available
+        //make sure vehicle is initially available
         assertEquals(Vehicle.VehicleStatus.Available, car.getStatus());
 
-        // 3. Retrieve the single RentalSystem instance
+        //the single RentalSystem instance
         RentalSystem rentalSystem = RentalSystem.getInstance();
 
-        // 4. Rent the vehicle for the first time
+        // Rent the vehicle first time
         boolean firstRent = rentalSystem.rentVehicle(car, customer, LocalDate.now(), 1.0);
         assertTrue(firstRent);
         assertEquals(Vehicle.VehicleStatus.Rented, car.getStatus());
 
-        // 5. Try renting the same vehicle again (should fail)
+        // rent the same vehicle again (should fail)
         boolean secondRent = rentalSystem.rentVehicle(car, customer, LocalDate.now(), 1.0);
         assertFalse(secondRent);
 
-        // 6. Return the vehicle
+        // Return the vehicle
         boolean firstReturn = rentalSystem.returnVehicle(car, customer, LocalDate.now(), 100.5);
         assertTrue(firstReturn);
         assertEquals(Vehicle.VehicleStatus.Available, car.getStatus());
 
-        // 7. Try returning the same vehicle again (should fail)
+        // returning the same vehicle again
         boolean secondReturn = rentalSystem.returnVehicle(car, customer,LocalDate.now(), 100.5);
         assertFalse(secondReturn);
     }
