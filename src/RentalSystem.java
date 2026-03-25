@@ -160,7 +160,7 @@ public class RentalSystem {
                 boolean accessible = extractValue(parts[7], "Accessible:").equalsIgnoreCase("Yes");
                 v = new Minibus(make, model, year, accessible);
             } else if (field.startsWith("Cargo Size:")) {
-                double cargoSize = Double.parseDouble(extractValue(parts[6], "Cargo Size:"));
+                double cargoSize = Double.parseDouble(extractValue(parts[7], "Cargo Size:"));
                 boolean hasTrailer = false;
                 if (parts.length > 8 && parts[8].trim().startsWith("Has Trailer:")) {
                     hasTrailer = extractValue(parts[8], "Has Trailer:").equalsIgnoreCase("Yes");
@@ -248,15 +248,15 @@ public class RentalSystem {
             vehicle.setStatus(Vehicle.VehicleStatus.Rented);
             rentalHistory.addRecord(new RentalRecord(vehicle, customer, date, amount, "RENT"));
             System.out.println("Vehicle rented to " + customer.getCustomerName());
+            saveVehicle();
+            RentalRecord record = new RentalRecord(vehicle, customer, date, amount, "RENT");
+            saveRecords(record);
             
 
         }
         else {
             System.out.println("Vehicle is not available for renting.");
         }
-        saveVehicle();
-        RentalRecord record = new RentalRecord(vehicle, customer, date, amount, "RENT");
-        saveRecords(record);
 
     }
 
