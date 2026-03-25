@@ -180,14 +180,34 @@ public class RentalSystem {
     }
     
     
-    public void addVehicle(Vehicle vehicle) {
-        vehicles.add(vehicle);
-        saveVehicle();
+    public boolean addVehicle(Vehicle vehicle) {
+    	String plate = vehicle.getLicensePlate();
+
+    	if (findVehicleByPlate(plate) == null) {
+    		vehicles.add(vehicle);
+    		saveVehicle();
+    		System.out.print("vehicle added succesfully ");
+        return true;
+    	}
+    	else {
+    		System.out.print("lisences plate already exists ");
+        return false;
+    	}
     }
 
-    public void addCustomer(Customer customer) {
-        customers.add(customer);
-        saveCustomer(customer);
+    public boolean addCustomer(Customer customer) {
+    	int ID = customer.getCustomerId();
+
+    	if (findCustomerById(ID) == null) {
+    		customers.add(customer);
+    		saveCustomer();
+    		System.out.print("customer added succesfully ");
+        return true;
+    	}
+    	else {
+    		System.out.print("customer id ID already exists ");
+        return false;
+    	}
     }
     
 
@@ -202,10 +222,12 @@ public class RentalSystem {
         }
     }
 
-    public void saveCustomer(Customer customer) {
+    public void saveCustomer() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("customers.txt", true))) {
-            writer.write(customer.toString());
-            writer.newLine();
+        	for (Customer v : customers) {
+                writer.write(v.toString());
+                writer.newLine();
+            }
         } catch (IOException e) {
             System.err.println("Error saving vehicle: " + e.getMessage());
         }
