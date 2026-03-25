@@ -22,13 +22,27 @@ public abstract class Vehicle {
         }
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
+
+    // validating plate input
+
+    private boolean isValidPlate(String plate) {
+    	if (plate == null || plate.isEmpty()) {
+    		return false;
+    	}
+        return plate.matches("^[A-Za-z]{3}[0-9]{3}$");
+    	}
     
     public Vehicle() {
         this(null, null, 0);
     }
 
     public void setLicensePlate(String plate) {
-        this.licensePlate = plate == null ? null : plate.toUpperCase();
+        if (!isValidPlate(plate)) {
+            throw new IllegalArgumentException("Invalid license plate. Plate must be three letters then by three numbers.");
+        }
+        
+        this.licensePlate = plate.toUpperCase();
+
     }
 
     public void setStatus(VehicleStatus status) {

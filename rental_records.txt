@@ -3,3 +3,5 @@ RENT | Plate: CCC333 | Customer: George | Date: 2026-03-25 | Amount: $15.0
 RENT | Plate: BBB222 | Customer: Anne | Date: 2026-03-25 | Amount: $15.0
 RETURN | Plate: CCC333 | Customer: George | Date: 2026-03-25 | Amount: $0.0
 RENT | Plate: CCC333 | Customer: Anne | Date: 2026-03-25 | Amount: $15.0
+RENT | Plate: ABC123 | Customer: John Doe | Date: 2026-03-25 | Amount: $1.0
+RETURN | Plate: ABC123 | Customer: John Doe | Date: 2026-03-25 | Amount: $100.5
